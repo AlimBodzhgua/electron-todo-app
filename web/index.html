@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo Application</title>
+    <script type="text/javascript" src="/eel.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="container_inner">
+            <h1 class='header'>Todo Application</h1>
+            <div class="container_header">
+                <input type="text" name="text" class="input_field">
+                <button class="btn-submit">+</button>    
+            </div>
+            <ol class="task_list">
+            </ol>    
+            <button class="btn-delete-all">Clear All</button>
+        </div>
+    </div>
+    
+    
+<script type="text/javascript">
+
+    const button = document.querySelector(".btn-submit");
+    const input = document.querySelector(".input_field");
+    const task_list = document.querySelector(".task_list");
+    const delete_all_btn = document.querySelector(".btn-delete-all");
+
+    async function get_tasks(){
+        let tasks = await eel.show_tasks()();
+        if(tasks.length >= 1){
+            for(let task of tasks){
+                let task_li = document.createElement("li");
+                let task_content = document.createElement("div");
+                let task_delete = document.createElement("button");
+                task_li.setAttribute("class", 'task');
+                task_delete.setAttribute("class", 'delete_btn');
+                task_list.appendChild(task_li);
+    
+                task_li.appendChild(task_content);
+                task_content.innerHTML = task;
+                task_li.appendChild(task_delete);
+                task_delete.innerHTML = 'delete';
+            }
+        }else{
+            task_list.innerHTML = "You have no tasks";
+        }
+        
+    }
+
+    get_tasks()
+    
+    button.addEventListener("click", function add_task_js(){
+        let task_value = input.value;
+        if(task_value.length < 2){
+            window.alert("Task value should be more than 2 symbols");
+        }else{
+            eel.add_task_py(task_value);
+            task_list.replaceChildren()
+            get_tasks();
+        }
+    });
+
+    let delete_buttons = document.getElementsByClassName("delete_btn");
+
+    task_list.addEventListener('click', (event) => {
+        const isButton = event.target.nodeName == "BUTTON";
+        if(!isButton) return;
+
+        let button = event.target;
+        let list_item = button.closest('li');
+        let div = list_item.querySelector('div');
+        
+        button.parentElement.remove()
+        eel.delete_task(div.innerHTML);
+        task_list.childNodes.remove();
+        get_tasks();
+    })
+    
+    delete_all_btn.addEventListener('click', function(){
+        eel.delete_all_tasks();
+        get_tasks();
+    })
+
+    
+</script>
+</body>
+</html>
