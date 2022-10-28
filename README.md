@@ -1,1 +1,1 @@
-# electron-todo-app2
+# Python todo application with eel 
